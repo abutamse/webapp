@@ -1,22 +1,1784 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Meine PWA</title>
-
-  <!-- PWA Manifest -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprachtrainer – Dein persönlicher Lernbegleiter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --bg-main: #0a0e27;
+  --bg-card: #151b3d;
+  --bg-input: #1a2147;
+  --accent-primary: #ff6b6b;
+  --accent-secondary: #4ecdc4;
+  --accent-tertiary: #ffe66d;
+  --text-primary: #ffffff;
+  --text-secondary: #a8b2d1;
+  --text-muted: #6b7a99;
+  --success: #51cf66;
+  --error: #ff6b6b;
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Work Sans', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(78, 205, 196, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 230, 109, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px;
+  margin: 30px auto;
+  max-width: 900px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px var(--shadow);
+  animation: fadeInUp 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+  opacity: 0.6;
+}
+
+.hidden {
+  display: none !important;
+}
+
+h1, h2, h3 {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(20deg); }
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+h3 {
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  margin-bottom: 1rem;
+  color: var(--accent-secondary);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-weight: 300;
+}
+
+button {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-primary), #ff8787);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  font-family: 'Work Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.secondary {
+  background: linear-gradient(135deg, var(--accent-secondary), #6edfd7);
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+button.secondary:hover {
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+button.ghost {
+  background: transparent;
+  border: 2px solid var(--border);
+  box-shadow: none;
+  color: var(--text-secondary);
+}
+
+button.ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-secondary);
+  box-shadow: none;
+}
+
+button.danger {
+  background: linear-gradient(135deg, #e63946, #f76b79);
+}
+
+button.small {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-family: 'Work Sans', sans-serif;
+  transition: all 0.3s ease;
+}
+
+textarea {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-family: 'Work Sans', sans-serif;
+  transition: all 0.3s ease;
+  resize: vertical;
+  min-height: 200px;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-secondary);
+  background: rgba(78, 205, 196, 0.05);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin: 20px 0;
+}
+
+thead th {
+  background: rgba(78, 205, 196, 0.1);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent-secondary);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+}
+
+thead th:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+thead th:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+tbody tr {
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(1.01);
+}
+
+tbody td {
+  padding: 10px 12px;
+  border: none;
+}
+
+tbody td:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+tbody td:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+tbody td input {
+  margin-bottom: 0;
+  background: var(--bg-main);
+}
+
+.flex {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.flex.center {
+  justify-content: center;
+  align-items: center;
+}
+
+.success {
+  color: var(--success);
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fail {
+  color: var(--error);
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.stats .stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'DM Serif Display', serif;
+}
+
+.stats .stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.message {
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 8px;
+  font-size: 14px;
+  animation: slideIn 0.3s ease;
+}
+
+.message.error {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid var(--error);
+  color: var(--error);
+}
+
+.message.success {
+  background: rgba(81, 207, 102, 0.1);
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+.quiz-container {
+  background: var(--bg-main);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  padding: 40px 20px;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: none;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(78, 205, 196, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 230, 109, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+.quiz-container.hidden {
+  display: none !important;
+}
+
+.quiz-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+.quiz-stats-mini {
+  position: absolute;
+  top: 30px;
+  display: flex;
+  gap: 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stat-mini {
+  color: var(--text-secondary);
+}
+
+.stat-mini-correct {
+  color: var(--success);
+}
+
+.stat-mini-wrong {
+  color: var(--error);
+}
+
+.quiz-question {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  margin-bottom: 60px;
+  text-align: center;
+  color: var(--text-primary);
+  max-width: 800px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.quiz-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px 30px;
+  font-size: 1.5rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--accent-secondary);
+  border-radius: 16px;
+  color: var(--text-primary);
+  margin-bottom: 40px;
+  font-family: 'Work Sans', sans-serif;
+}
+
+.quiz-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.choices-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 40px;
+}
+
+.choice-btn {
+  padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-family: 'Work Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-secondary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.choice-btn.correct {
+  background: rgba(81, 207, 102, 0.2);
+  border-color: var(--success);
+  color: var(--success);
+  animation: correctPulse 0.5s ease;
+}
+
+.choice-btn.wrong {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: var(--error);
+  color: var(--error);
+  animation: wrongShake 0.5s ease;
+}
+
+.choice-btn.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.quiz-result {
+  text-align: center;
+  margin: 20px 0;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.quiz-exit-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.feature-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.feature-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid rgba(78, 205, 196, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--accent-secondary);
+  margin: 4px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 25px;
+    margin: 20px auto;
+  }
+  
+  button {
+    width: 100%;
+  }
+  
+  .flex button {
+    flex: 1 1 100%;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  tbody td input {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-secondary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+</style>
 </head>
 <body>
 
-  <h1>Hallo 👋</h1>
-  <p>Das ist meine erste PWA</p>
+<div class="container">
+  <!-- ============ HOME / AUTH ============ -->
+  <div id="home" class="card">
+    <h1>Sprachtrainer</h1>
+    <p class="subtitle">Dein persönlicher Lernbegleiter für Vokabeln und Konjugationen</p>
+    
+    <div class="welcome-grid">
+      <div class="feature-card" onclick="show('login')">
+        <div class="feature-icon">🔑</div>
+        <div class="feature-title">Login</div>
+        <div class="feature-desc">Melde dich an und lerne weiter</div>
+      </div>
+      
+      <div class="feature-card" onclick="show('signup')">
+        <div class="feature-icon">✨</div>
+        <div class="feature-title">Registrieren</div>
+        <div class="feature-desc">Erstelle dein kostenloses Konto</div>
+      </div>
+    </div>
+  </div>
 
-  <script>
+  <div id="login" class="card hidden">
+    <h2>Willkommen zurück</h2>
+    <p class="subtitle">Melde dich an, um weiterzulernen</p>
+    <input id="loginUser" placeholder="Benutzername">
+    <input id="loginPass" type="password" placeholder="Passwort">
+    <div id="loginMsg"></div>
+    <div class="flex">
+      <button onclick="login()">Anmelden</button>
+      <button class="ghost" onclick="show('home')">Zurück</button>
+    </div>
+  </div>
+
+  <div id="signup" class="card hidden">
+    <h2>Konto erstellen</h2>
+    <p class="subtitle">Starte deine Lernreise heute</p>
+    <input id="signUser" placeholder="Benutzername">
+    <input id="signPass" type="password" placeholder="Passwort">
+    <div id="signMsg"></div>
+    <div class="flex">
+      <button onclick="signup()">Registrieren</button>
+      <button class="ghost" onclick="show('home')">Zurück</button>
+    </div>
+  </div>
+
+  <!-- ============ MENU ============ -->
+  <div id="menu" class="card hidden">
+    <h2 id="hello"></h2>
+    <p class="subtitle">Was möchtest du heute lernen?</p>
+    
+    <div class="welcome-grid">
+      <div class="feature-card" onclick="openVocab()">
+        <div class="feature-icon">📚</div>
+        <div class="feature-title">Vokabeltrainer</div>
+        <div class="feature-desc">Lerne und teste deine Vokabeln</div>
+      </div>
+      
+      <div class="feature-card" onclick="openConj()">
+        <div class="feature-icon">🔤</div>
+        <div class="feature-title">Konjugation</div>
+        <div class="feature-desc">Übe Verbformen in verschiedenen Sprachen</div>
+      </div>
+      
+      <div class="feature-card" onclick="openNotes()">
+        <div class="feature-icon">📝</div>
+        <div class="feature-title">Notizen</div>
+        <div class="feature-desc">Speichere Texte und wichtige Infos</div>
+      </div>
+    </div>
+    
+    <div class="flex center" style="margin-top: 30px;">
+      <button class="ghost" onclick="logout()">Ausloggen</button>
+    </div>
+  </div>
+
+  <!-- ============ VOCAB ============ -->
+  <div id="vocab" class="card hidden">
+    <h2>📚 Vokabeltrainer</h2>
+    
+    <label>Vokabelblock:</label>
+    <select id="vocabBlock" onchange="changeVocabBlock()"></select>
+
+    <div class="flex">
+      <button class="secondary" onclick="addVocabBlock()">➕ Neuer Block</button>
+      <button class="ghost small" onclick="renameVocabBlock()">✏️ Umbenennen</button>
+      <button class="ghost small danger" onclick="deleteVocabBlock()">🗑️ Löschen</button>
+    </div>
+
+    <div id="vocabTableContainer">
+      <table id="vocabTable">
+        <thead>
+          <tr>
+            <th>Deutsch</th>
+            <th>Fremdsprache</th>
+            <th style="width: 80px;"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="flex">
+      <button class="ghost" onclick="addVocabRow()">➕ Neue Zeile</button>
+      <button class="secondary" onclick="saveVocab()">💾 Speichern</button>
+      <button onclick="startVocabQuiz()">🎯 Quiz starten</button>
+      <button class="ghost" onclick="show('menu')">← Zurück</button>
+    </div>
+  </div>
+
+  <!-- ============ KONJUGATION ============ -->
+  <div id="conj" class="card hidden">
+    <h2>🔤 Konjugationstrainer</h2>
+
+    <label>Sprache:</label>
+    <select id="conjLang" onchange="changeConjLang()">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="fr">🇫🇷 Französisch</option>
+      <option value="en">🇬🇧 Englisch</option>
+    </select>
+
+    <label>Verbblock:</label>
+    <select id="conjBlock" onchange="changeConjBlock()"></select>
+
+    <div class="flex">
+      <button class="secondary" onclick="addConjBlock()">➕ Neuer Block</button>
+      <button class="ghost small" onclick="renameConjBlock()">✏️ Umbenennen</button>
+      <button class="ghost small danger" onclick="deleteConjBlock()">🗑️ Löschen</button>
+      <button class="ghost small" onclick="toggleIrregular()">🔄 <span id="irregBtnText">Unregelmäßige</span></button>
+    </div>
+
+    <div id="conjTableContainer">
+      <table id="conjTable">
+        <thead><tr><th>Infinitiv</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="flex">
+      <button class="ghost" onclick="addConjRow()">➕ Neue Zeile</button>
+      <button class="secondary" onclick="saveConj()">💾 Speichern</button>
+      <button onclick="startConjQuiz()">🎯 Quiz starten</button>
+      <button class="ghost" onclick="show('menu')">← Zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NOTIZEN ============ -->
+<div id="notes" class="card hidden">
+  <h2>📝 Notizen & Texte</h2>
+  <p class="subtitle">Speichere Texte, Notizen und wichtige Infos</p>
+  
+  <label>Notiz:</label>
+  <select id="noteSelect" onchange="changeNote()"></select>
+
+  <div class="flex">
+    <button class="secondary" onclick="addNote()">➕ Neue Notiz</button>
+    <button class="ghost small" onclick="renameNote()">✏️ Umbenennen</button>
+    <button class="ghost small danger" onclick="deleteNote()">🗑️ Löschen</button>
+  </div>
+
+  <label>Titel:</label>
+  <input id="noteTitle" placeholder="z.B. Wichtige Vokabeln, Grammatikregeln...">
+  
+  <label>Text:</label>
+  <textarea id="noteContent" rows="15" placeholder="Schreibe hier deine Notizen..."></textarea>
+
+  <div class="flex">
+    <button class="secondary" onclick="saveNote()">💾 Speichern</button>
+    <button class="ghost" onclick="show('menu')">← Zurück</button>
+  </div>
+</div>
+</div>
+
+<!-- ============ FULLSCREEN QUIZ CONTAINERS ============ -->
+<div id="vocabQuiz" class="hidden quiz-container">
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="vocabProgress"></div>
+  </div>
+  
+  <div class="quiz-stats-mini">
+    <span class="stat-mini stat-mini-correct">✓ <span id="vocabRightMini">0</span></span>
+    <span class="stat-mini stat-mini-wrong">✗ <span id="vocabWrongMini">0</span></span>
+    <span class="stat-mini">📚 <span id="vocabRemaining">0</span> übrig</span>
+  </div>
+  
+  <div style="position: absolute; top: 30px; right: 30px; color: var(--text-muted); font-size: 14px;">
+    <span id="vocabModeIndicator">🎯 Multiple Choice</span>
+  </div>
+  
+  <h3 class="quiz-question" id="vocabQ"></h3>
+  
+  <div id="vocabChoices" class="choices-container"></div>
+  <input id="vocabInput" class="quiz-input hidden" placeholder="Deine Antwort (Enter zum Bestätigen)">
+  
+  <div id="vocabR" class="quiz-result"></div>
+  
+  <button id="vocabNextBtn" class="hidden" onclick="nextVocab()">Weiter →</button>
+  <button class="ghost quiz-exit-btn" onclick="endVocabQuiz()">← Quiz beenden</button>
+</div>
+
+<div id="conjQuiz" class="hidden quiz-container">
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="conjProgress"></div>
+  </div>
+  
+  <div class="quiz-stats-mini">
+    <span class="stat-mini stat-mini-correct">✓ <span id="conjRightMini">0</span></span>
+    <span class="stat-mini stat-mini-wrong">✗ <span id="conjWrongMini">0</span></span>
+    <span class="stat-mini">🔤 <span id="conjRemaining">0</span> übrig</span>
+  </div>
+  
+  <div style="position: absolute; top: 30px; right: 30px; color: var(--text-muted); font-size: 14px;">
+    <span id="conjModeIndicator">🎯 Multiple Choice</span>
+  </div>
+  
+  <h3 class="quiz-question" id="conjQ"></h3>
+  
+  <div id="conjChoices" class="choices-container"></div>
+  <input id="conjInput" class="quiz-input hidden" placeholder="Deine Antwort (Enter zum Bestätigen)">
+  
+  <div id="conjR" class="quiz-result"></div>
+  
+  <button id="conjNextBtn" class="hidden" onclick="nextConj()">Weiter →</button>
+  <button class="ghost quiz-exit-btn" onclick="endConjQuiz()">← Quiz beenden</button>
+</div>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
-  </script>
+<script>
+/* ========= BASIS ========= */
+const $ = id => document.getElementById(id);
+
+function show(id) {
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  const el = $(id);
+  if (el) {
+    el.classList.remove('hidden');
+    el.style.animation = 'none';
+    setTimeout(() => el.style.animation = 'fadeInUp 0.6s ease-out', 10);
+  }
+}
+
+function showMessage(elementId, text, type = 'error') {
+  const el = $(elementId);
+  el.innerHTML = `<div class="message ${type}">${text}</div>`;
+  setTimeout(() => el.innerHTML = '', 3000);
+}
+
+/* ========= AUTH ========= */
+let users = JSON.parse(localStorage.getItem('users') || '{}');
+let currentUser = null;
+
+function signup() {
+  const u = $('signUser').value.trim();
+  const p = $('signPass').value.trim();
+  
+  if (!u || !p) {
+    showMessage('signMsg', 'Bitte fülle alle Felder aus');
+    return;
+  }
+  
+  if (users[u]) {
+    showMessage('signMsg', 'Dieser Benutzername existiert bereits');
+    return;
+  }
+  
+  users[u] = p;
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('vocabBlocks_' + u, JSON.stringify(['Standard']));
+  localStorage.setItem('noteBlocks_' + u, JSON.stringify(['Meine erste Notiz']));
+  
+  ['de', 'fr', 'en'].forEach(l => {
+    localStorage.setItem('conjBlocks_' + u + '_' + l, JSON.stringify(['Block 1']));
+    localStorage.setItem('irregBlocks_' + u + '_' + l, JSON.stringify(['Unregelmäßig']));
+  });
+  
+  showMessage('signMsg', '✓ Konto erfolgreich erstellt! Bitte melde dich jetzt an.', 'success');
+  $('signUser').value = '';
+  $('signPass').value = '';
+}
+
+function login() {
+  const u = $('loginUser').value.trim();
+  const p = $('loginPass').value.trim();
+  
+  if (users[u] !== p) {
+    showMessage('loginMsg', 'Ungültige Anmeldedaten');
+    return;
+  }
+  
+  currentUser = u;
+  $('hello').innerText = `Hallo, ${u}! 👋`;
+  show('menu');
+}
+
+function logout() {
+  currentUser = null;
+  show('home');
+}
+
+/* ========= VOCAB ========= */
+let vocabBlocks = [];
+let currentBlock = '';
+let vocabData = [];
+let stats = { right: 0, wrong: 0 };
+
+function openVocab() {
+  show('vocab');
+  loadVocabBlocks();
+}
+
+function loadVocabBlocks() {
+  vocabBlocks = JSON.parse(localStorage.getItem('vocabBlocks_' + currentUser) || '["Standard"]');
+  const sel = $('vocabBlock');
+  sel.innerHTML = '';
+  vocabBlocks.forEach(b => {
+    const o = document.createElement('option');
+    o.value = o.text = b;
+    sel.appendChild(o);
+  });
+  currentBlock = sel.value = vocabBlocks[0];
+  loadVocab();
+}
+
+function changeVocabBlock() {
+  currentBlock = $('vocabBlock').value;
+  loadVocab();
+}
+
+function addVocabBlock() {
+  const n = prompt('Name des neuen Vokabelblocks:');
+  if (!n) return;
+  vocabBlocks.push(n);
+  localStorage.setItem('vocabBlocks_' + currentUser, JSON.stringify(vocabBlocks));
+  currentBlock = n;
+  loadVocabBlocks();
+}
+
+function renameVocabBlock() {
+  const n = prompt('Neuer Name:', currentBlock);
+  if (!n) return;
+  const i = vocabBlocks.indexOf(currentBlock);
+  vocabBlocks[i] = n;
+  localStorage.setItem('vocabBlocks_' + currentUser, JSON.stringify(vocabBlocks));
+  localStorage.setItem('vocab_' + currentUser + '_' + n, localStorage.getItem('vocab_' + currentUser + '_' + currentBlock));
+  localStorage.removeItem('vocab_' + currentUser + '_' + currentBlock);
+  currentBlock = n;
+  loadVocabBlocks();
+}
+
+function deleteVocabBlock() {
+  if (!confirm('Block "' + currentBlock + '" wirklich löschen?')) return;
+  localStorage.removeItem('vocab_' + currentUser + '_' + currentBlock);
+  vocabBlocks = vocabBlocks.filter(b => b !== currentBlock);
+  localStorage.setItem('vocabBlocks_' + currentUser, JSON.stringify(vocabBlocks));
+  currentBlock = vocabBlocks[0];
+  loadVocabBlocks();
+}
+
+function addVocabRow(d = '', f = '') {
+  const r = $('vocabTable').querySelector('tbody').insertRow();
+  r.insertCell(0).innerHTML = `<input value="${d}" placeholder="Deutsch">`;
+  r.insertCell(1).innerHTML = `<input value="${f}" placeholder="Fremdsprache">`;
+  r.insertCell(2).innerHTML = `<button class="small danger" onclick="this.parentNode.parentNode.remove()">🗑️</button>`;
+}
+
+function loadVocab() {
+  vocabData = JSON.parse(localStorage.getItem('vocab_' + currentUser + '_' + currentBlock) || '[]');
+  const tbody = $('vocabTable').querySelector('tbody');
+  tbody.innerHTML = '';
+  vocabData.forEach(v => addVocabRow(v.d, v.f));
+  if (!vocabData.length) addVocabRow();
+}
+
+function saveVocab() {
+  vocabData = [];
+  for (let r of $('vocabTable').querySelector('tbody').rows) {
+    const d = r.cells[0].querySelector('input').value.trim();
+    const f = r.cells[1].querySelector('input').value.trim();
+    if (d && f) vocabData.push({ d, f });
+  }
+  localStorage.setItem('vocab_' + currentUser + '_' + currentBlock, JSON.stringify(vocabData));
+  
+  // Only show alert if called directly (not from quiz start)
+  if (!arguments[0]) {
+    alert('✓ Gespeichert!');
+  }
+  
+  return vocabData.length; // Return count for quiz check
+}
+
+/* ========= VOCAB QUIZ ========= */
+let quizWord = null;
+let quizPool = []; // Words that still need to be learned
+let wrongAnswers = []; // Words answered wrong (come back later)
+let vocabQuizMode = 'multiple'; // 'multiple' or 'text'
+
+function startVocabQuiz() {
+  // First, save current data (silently)
+  const count = saveVocab(true);
+  
+  // Reload from storage to ensure we have latest data
+  vocabData = JSON.parse(localStorage.getItem('vocab_' + currentUser + '_' + currentBlock) || '[]');
+  
+  if (!vocabData.length) {
+    alert('Keine Vokabeln vorhanden. Bitte füge zuerst Vokabeln hinzu und speichere sie.');
+    return;
+  }
+  
+  stats = { right: 0, wrong: 0 };
+  quizPool = [...vocabData]; // Clone all vocab
+  wrongAnswers = [];
+  
+  $('vocabQuiz').classList.remove('hidden');
+  
+  nextVocab();
+}
+
+function nextVocab() {
+  // If quiz pool is empty but we have wrong answers, add them back
+  if (quizPool.length === 0 && wrongAnswers.length > 0) {
+    quizPool = [...wrongAnswers];
+    wrongAnswers = [];
+  }
+  
+  // If everything is done
+  if (quizPool.length === 0) {
+    endVocabQuiz(true);
+    return;
+  }
+  
+  // Pick random word from pool
+  const randomIndex = Math.floor(Math.random() * quizPool.length);
+  quizWord = quizPool[randomIndex];
+  
+  // Randomly choose mode for this question
+  vocabQuizMode = Math.random() < 0.5 ? 'multiple' : 'text';
+  
+  // Update UI
+  $('vocabQ').innerText = '🇩🇪 ' + quizWord.d;
+  $('vocabR').innerHTML = '';
+  $('vocabNextBtn').classList.add('hidden');
+  
+  // Generate appropriate input based on mode
+  if (vocabQuizMode === 'multiple') {
+    $('vocabModeIndicator').innerText = '🎯 Multiple Choice';
+    $('vocabChoices').classList.remove('hidden');
+    $('vocabInput').classList.add('hidden');
+    generateVocabChoices();
+  } else {
+    $('vocabModeIndicator').innerText = '📝 Texteingabe';
+    $('vocabChoices').classList.add('hidden');
+    $('vocabInput').classList.remove('hidden');
+    $('vocabInput').value = '';
+    $('vocabInput').focus();
+  }
+  
+  updateVocabStatsDisplay();
+  updateProgressBar();
+}
+
+function generateVocabChoices() {
+  const choices = [quizWord.f]; // Correct answer
+  
+  // Add 3 random wrong answers
+  const otherWords = vocabData.filter(v => v.f !== quizWord.f);
+  while (choices.length < 4 && otherWords.length > 0) {
+    const randomIndex = Math.floor(Math.random() * otherWords.length);
+    const wrongAnswer = otherWords.splice(randomIndex, 1)[0];
+    if (!choices.includes(wrongAnswer.f)) {
+      choices.push(wrongAnswer.f);
+    }
+  }
+  
+  // Shuffle choices
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]];
+  }
+  
+  // Render choice buttons
+  const container = $('vocabChoices');
+  container.innerHTML = '';
+  
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choice;
+    btn.onclick = () => checkVocabAnswer(choice, btn);
+    container.appendChild(btn);
+  });
+}
+
+function checkVocabAnswer(selected, btn) {
+  const allButtons = document.querySelectorAll('.choice-btn');
+  const correct = selected === quizWord.f;
+  
+  // Disable all buttons
+  allButtons.forEach(b => b.classList.add('disabled'));
+  
+  if (correct) {
+    btn.classList.add('correct');
+    stats.right++;
+    $('vocabR').innerHTML = '<span class="success">✓ Richtig!</span>';
+    
+    // Remove from quiz pool (won't come back)
+    const index = quizPool.findIndex(w => w.d === quizWord.d && w.f === quizWord.f);
+    if (index > -1) {
+      quizPool.splice(index, 1);
+    }
+    
+    // Auto-advance after 1 second
+    setTimeout(() => {
+      nextVocab();
+    }, 1000);
+    
+  } else {
+    btn.classList.add('wrong');
+    stats.wrong++;
+    
+    // Show correct answer
+    allButtons.forEach(b => {
+      if (b.textContent === quizWord.f) {
+        b.classList.add('correct');
+      }
+    });
+    
+    $('vocabR').innerHTML = '<span class="fail">✗ Richtig wäre: ' + quizWord.f + '</span>';
+    
+    // Remove from current pool and add to wrong answers (will come back)
+    const index = quizPool.findIndex(w => w.d === quizWord.d && w.f === quizWord.f);
+    if (index > -1) {
+      const wrongWord = quizPool.splice(index, 1)[0];
+      wrongAnswers.push(wrongWord);
+    }
+    
+    // Show next button (don't auto-advance on wrong answers)
+    $('vocabNextBtn').classList.remove('hidden');
+  }
+  
+  updateVocabStatsDisplay();
+  updateProgressBar();
+}
+
+function updateVocabStatsDisplay() {
+  $('vocabRightMini').innerText = stats.right;
+  $('vocabWrongMini').innerText = stats.wrong;
+  $('vocabRemaining').innerText = quizPool.length + wrongAnswers.length;
+}
+
+function updateProgressBar() {
+  const total = vocabData.length;
+  const completed = stats.right;
+  const percentage = (completed / total) * 100;
+  $('vocabProgress').style.width = percentage + '%';
+}
+
+// Text input handler for vocab quiz
+$('vocabInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const userAnswer = $('vocabInput').value.trim().toLowerCase();
+    const correctAnswer = quizWord.f.toLowerCase();
+    const correct = userAnswer === correctAnswer;
+    
+    if (correct) {
+      stats.right++;
+      $('vocabR').innerHTML = '<span class="success">✓ Richtig!</span>';
+      
+      // Remove from quiz pool
+      const index = quizPool.findIndex(w => w.d === quizWord.d && w.f === quizWord.f);
+      if (index > -1) {
+        quizPool.splice(index, 1);
+      }
+      
+      updateVocabStatsDisplay();
+      updateProgressBar();
+      
+      // Auto-advance after 1 second
+      setTimeout(() => {
+        nextVocab();
+      }, 1000);
+      
+    } else {
+      stats.wrong++;
+      $('vocabR').innerHTML = '<span class="fail">✗ Richtig wäre: ' + quizWord.f + '</span>';
+      
+      // Remove from current pool and add to wrong answers
+      const index = quizPool.findIndex(w => w.d === quizWord.d && w.f === quizWord.f);
+      if (index > -1) {
+        const wrongWord = quizPool.splice(index, 1)[0];
+        wrongAnswers.push(wrongWord);
+      }
+      
+      updateVocabStatsDisplay();
+      updateProgressBar();
+      
+      // Show next button
+      $('vocabNextBtn').classList.remove('hidden');
+    }
+  }
+});
+
+function endVocabQuiz(completed = false) {
+  $('vocabQuiz').classList.add('hidden');
+  
+  const total = stats.right + stats.wrong;
+  const accuracy = total > 0 ? Math.round((stats.right / total) * 100) : 0;
+  
+  const message = completed 
+    ? `🎉 Quiz abgeschlossen!\n\nAlle Vokabeln gelernt!\nRichtig: ${stats.right}\nFalsch: ${stats.wrong}\nGenauigkeit: ${accuracy}%`
+    : `Quiz beendet!\n\nRichtig: ${stats.right}\nFalsch: ${stats.wrong}\nGenauigkeit: ${accuracy}%`;
+  
+  alert(message);
+}
+
+/* ========= NOTIZEN ========= */
+let noteBlocks = [];
+let currentNote = '';
+
+function openNotes() {
+  show('notes');
+  loadNoteBlocks();
+}
+
+function loadNoteBlocks() {
+  noteBlocks = JSON.parse(localStorage.getItem('noteBlocks_' + currentUser) || '["Meine erste Notiz"]');
+  const sel = $('noteSelect');
+  sel.innerHTML = '';
+  noteBlocks.forEach(n => {
+    const o = document.createElement('option');
+    o.value = o.text = n;
+    sel.appendChild(o);
+  });
+  currentNote = sel.value = noteBlocks[0];
+  loadNote();
+}
+
+function changeNote() {
+  currentNote = $('noteSelect').value;
+  loadNote();
+}
+
+function addNote() {
+  const n = prompt('Name der neuen Notiz:');
+  if (!n) return;
+  noteBlocks.push(n);
+  localStorage.setItem('noteBlocks_' + currentUser, JSON.stringify(noteBlocks));
+  currentNote = n;
+  loadNoteBlocks();
+}
+
+function renameNote() {
+  const n = prompt('Neuer Name:', currentNote);
+  if (!n) return;
+  const i = noteBlocks.indexOf(currentNote);
+  noteBlocks[i] = n;
+  localStorage.setItem('noteBlocks_' + currentUser, JSON.stringify(noteBlocks));
+  
+  const noteData = localStorage.getItem('note_' + currentUser + '_' + currentNote);
+  localStorage.setItem('note_' + currentUser + '_' + n, noteData);
+  localStorage.removeItem('note_' + currentUser + '_' + currentNote);
+  
+  currentNote = n;
+  loadNoteBlocks();
+}
+
+function deleteNote() {
+  if (!confirm('Notiz "' + currentNote + '" wirklich löschen?')) return;
+  localStorage.removeItem('note_' + currentUser + '_' + currentNote);
+  noteBlocks = noteBlocks.filter(n => n !== currentNote);
+  localStorage.setItem('noteBlocks_' + currentUser, JSON.stringify(noteBlocks));
+  currentNote = noteBlocks[0];
+  loadNoteBlocks();
+}
+
+function loadNote() {
+  const noteData = JSON.parse(localStorage.getItem('note_' + currentUser + '_' + currentNote) || '{"title":"","content":""}');
+  $('noteTitle').value = noteData.title || '';
+  $('noteContent').value = noteData.content || '';
+}
+
+function saveNote() {
+  const noteData = {
+    title: $('noteTitle').value.trim(),
+    content: $('noteContent').value
+  };
+  localStorage.setItem('note_' + currentUser + '_' + currentNote, JSON.stringify(noteData));
+  
+  if (!arguments[0]) {
+    alert('✓ Notiz gespeichert!');
+  }
+}
+
+/* ========= KONJUGATION ========= */
+let conjLang = 'de';
+let conjMode = 'regular';
+let conjBlocks = [];
+let currentConjBlock = '';
+let conjVerbs = [];
+let conjStats = { right: 0, wrong: 0 };
+let quizConj = null;
+let conjQuizPool = [];
+let conjWrongAnswers = [];
+let conjQuizMode = 'multiple';
+
+const PERSON_KEYS = ['p1s', 'p2s', 'p3s', 'p1p', 'p2p', 'p3p'];
+const PERSON_LABELS = {
+  de: ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie'],
+  fr: ['je', 'tu', 'il/elle', 'nous', 'vous', 'ils/elles'],
+  en: ['I', 'you', 'he/she/it', 'we', 'you (pl)', 'they']
+};
+
+function blockKey() {
+  return `${conjMode}Blocks_${currentUser}_${conjLang}`;
+}
+
+function dataKey() {
+  return `${conjMode}_${currentUser}_${conjLang}_${currentConjBlock}`;
+}
+
+function openConj() {
+  show('conj');
+  loadConjBlocks();
+}
+
+function loadConjBlocks() {
+  conjBlocks = JSON.parse(localStorage.getItem(blockKey()) || '["Standard"]');
+  const sel = $('conjBlock');
+  sel.innerHTML = '';
+  conjBlocks.forEach(b => {
+    const o = document.createElement('option');
+    o.value = o.text = b;
+    sel.appendChild(o);
+  });
+  currentConjBlock = sel.value = conjBlocks[0];
+  renderConj();
+}
+
+function addConjBlock() {
+  const n = prompt('Name des neuen Blocks:');
+  if (!n) return;
+  conjBlocks.push(n);
+  localStorage.setItem(blockKey(), JSON.stringify(conjBlocks));
+  currentConjBlock = n;
+  loadConjBlocks();
+}
+
+function renameConjBlock() {
+  const n = prompt('Neuer Name:', currentConjBlock);
+  if (!n) return;
+  const i = conjBlocks.indexOf(currentConjBlock);
+  conjBlocks[i] = n;
+  localStorage.setItem(blockKey(), JSON.stringify(conjBlocks));
+  localStorage.setItem(dataKey().replace(currentConjBlock, n), localStorage.getItem(dataKey()));
+  localStorage.removeItem(dataKey());
+  currentConjBlock = n;
+  loadConjBlocks();
+}
+
+function deleteConjBlock() {
+  if (!confirm('Block "' + currentConjBlock + '" wirklich löschen?')) return;
+  localStorage.removeItem(dataKey());
+  conjBlocks = conjBlocks.filter(b => b !== currentConjBlock);
+  localStorage.setItem(blockKey(), JSON.stringify(conjBlocks));
+  currentConjBlock = conjBlocks[0];
+  loadConjBlocks();
+}
+
+function toggleIrregular() {
+  conjMode = conjMode === 'regular' ? 'irregular' : 'regular';
+  $('irregBtnText').innerText = conjMode === 'irregular' ? 'Reguläre' : 'Unregelmäßige';
+  loadConjBlocks();
+}
+
+function changeConjLang() {
+  conjLang = $('conjLang').value;
+  loadConjBlocks();
+}
+
+function changeConjBlock() {
+  currentConjBlock = $('conjBlock').value;
+  renderConj();
+}
+
+function renderConj() {
+  renderHeader('conjTable', conjLang);
+  conjVerbs = JSON.parse(localStorage.getItem(dataKey()) || '[]');
+  const tb = $('conjTable').querySelector('tbody');
+  tb.innerHTML = '';
+  conjVerbs.forEach(v => addConjRow(v));
+  if (!conjVerbs.length) addConjRow();
+}
+
+function renderHeader(tableId, lang) {
+  const h = PERSON_LABELS[lang].map(p => `<th>${p}</th>`).join('');
+  $(tableId).querySelector('thead').innerHTML = `<tr><th>Infinitiv</th>${h}<th style="width: 140px;"></th></tr>`;
+}
+
+function addConjRow(v = { inf: '', p1s: '', p2s: '', p3s: '', p1p: '', p2p: '', p3p: '' }) {
+  const r = $('conjTable').querySelector('tbody').insertRow();
+  r.insertCell(0).innerHTML = `<input value="${v.inf}" placeholder="Infinitiv">`;
+  PERSON_KEYS.forEach((k, i) => r.insertCell(i + 1).innerHTML = `<input value="${v[k] || ''}" placeholder="${PERSON_LABELS[conjLang][i]}">`);
+  r.insertCell(7).innerHTML =
+    (conjMode === 'regular' ? `<button class="small secondary" onclick="autoConj(this)">🤖 Auto</button> ` : '') +
+    `<button class="small danger" onclick="this.parentNode.parentNode.remove()">🗑️</button>`;
+}
+
+function autoConj(btn) {
+  const r = btn.parentNode.parentNode;
+  const inf = r.cells[0].querySelector('input').value.trim();
+  if (!inf) return;
+  
+  if (conjLang === 'de') {
+    const s = inf.replace(/en$|n$/, '');
+    ['e', 'st', 't', 'en', 't', 'en'].forEach((e, i) => r.cells[i + 1].querySelector('input').value = s + e);
+  }
+  if (conjLang === 'fr') {
+    if (!inf.endsWith('er')) return alert('Auto-Konjugation nur für -er Verben');
+    const s = inf.slice(0, -2);
+    ['e', 'es', 'e', 'ons', 'ez', 'ent'].forEach((e, i) => r.cells[i + 1].querySelector('input').value = s + e);
+  }
+  if (conjLang === 'en') {
+    ['I', 'you', 'he/she/it', 'we', 'you', 'they'].forEach((p, i) => 
+      r.cells[i + 1].querySelector('input').value = (i === 2 ? inf + 's' : inf));
+  }
+}
+
+function saveConj() {
+  conjVerbs = [];
+  for (const r of $('conjTable').querySelector('tbody').rows) {
+    const v = { inf: r.cells[0].querySelector('input').value.trim() };
+    PERSON_KEYS.forEach((k, i) => v[k] = r.cells[i + 1].querySelector('input').value.trim());
+    if (v.inf) conjVerbs.push(v);
+  }
+  localStorage.setItem(dataKey(), JSON.stringify(conjVerbs));
+  
+  if (!arguments[0]) {
+    alert('✓ Gespeichert!');
+  }
+  
+  return conjVerbs.length;
+}
+
+function startConjQuiz() {
+  // Save current data silently
+  saveConj(true);
+  
+  // Reload from storage
+  conjVerbs = JSON.parse(localStorage.getItem(dataKey()) || '[]');
+  
+  if (!conjVerbs.length) {
+    alert('Keine Verben vorhanden. Bitte füge zuerst Verben hinzu und speichere sie.');
+    return;
+  }
+  
+  conjStats = { right: 0, wrong: 0 };
+  
+  // Create quiz pool with all person/verb combinations
+  conjQuizPool = [];
+  conjVerbs.forEach(v => {
+    PERSON_KEYS.forEach((key, i) => {
+      if (v[key] && v[key].trim()) {
+        conjQuizPool.push({ verb: v, personIndex: i });
+      }
+    });
+  });
+  
+  conjWrongAnswers = [];
+  
+  $('conjQuiz').classList.remove('hidden');
+  
+  nextConj();
+}
+
+function nextConj() {
+  if (conjQuizPool.length === 0 && conjWrongAnswers.length > 0) {
+    conjQuizPool = [...conjWrongAnswers];
+    conjWrongAnswers = [];
+  }
+  
+  if (conjQuizPool.length === 0) {
+    endConjQuiz(true);
+    return;
+  }
+  
+  const randomIndex = Math.floor(Math.random() * conjQuizPool.length);
+  quizConj = conjQuizPool[randomIndex];
+  
+  // Randomly choose mode for this question
+  conjQuizMode = Math.random() < 0.5 ? 'multiple' : 'text';
+  
+  $('conjQ').innerText = `${PERSON_LABELS[conjLang][quizConj.personIndex]} von "${quizConj.verb.inf}"`;
+  $('conjR').innerHTML = '';
+  $('conjNextBtn').classList.add('hidden');
+  
+  if (conjQuizMode === 'multiple') {
+    $('conjModeIndicator').innerText = '🎯 Multiple Choice';
+    $('conjChoices').classList.remove('hidden');
+    $('conjInput').classList.add('hidden');
+    generateConjChoices();
+  } else {
+    $('conjModeIndicator').innerText = '📝 Texteingabe';
+    $('conjChoices').classList.add('hidden');
+    $('conjInput').classList.remove('hidden');
+    $('conjInput').value = '';
+    $('conjInput').focus();
+  }
+  
+  updateConjStatsDisplay();
+  updateConjProgressBar();
+}
+
+function generateConjChoices() {
+  const correctAnswer = quizConj.verb[PERSON_KEYS[quizConj.personIndex]];
+  const choices = [correctAnswer];
+  
+  // Add wrong answers from same verb (other persons)
+  PERSON_KEYS.forEach(key => {
+    if (choices.length < 4 && quizConj.verb[key] && quizConj.verb[key] !== correctAnswer) {
+      if (!choices.includes(quizConj.verb[key])) {
+        choices.push(quizConj.verb[key]);
+      }
+    }
+  });
+  
+  // Add wrong answers from other verbs
+  const otherVerbs = conjVerbs.filter(v => v.inf !== quizConj.verb.inf);
+  while (choices.length < 4 && otherVerbs.length > 0) {
+    const randomVerb = otherVerbs[Math.floor(Math.random() * otherVerbs.length)];
+    const randomPerson = PERSON_KEYS[Math.floor(Math.random() * PERSON_KEYS.length)];
+    if (randomVerb[randomPerson] && !choices.includes(randomVerb[randomPerson])) {
+      choices.push(randomVerb[randomPerson]);
+    }
+  }
+  
+  // Shuffle
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]];
+  }
+  
+  const container = $('conjChoices');
+  container.innerHTML = '';
+  
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choice;
+    btn.onclick = () => checkConjAnswer(choice, btn);
+    container.appendChild(btn);
+  });
+}
+
+function checkConjAnswer(selected, btn) {
+  const allButtons = document.querySelectorAll('#conjChoices .choice-btn');
+  const correctAnswer = quizConj.verb[PERSON_KEYS[quizConj.personIndex]];
+  const correct = selected === correctAnswer;
+  
+  allButtons.forEach(b => b.classList.add('disabled'));
+  
+  if (correct) {
+    btn.classList.add('correct');
+    conjStats.right++;
+    $('conjR').innerHTML = '<span class="success">✓ Richtig!</span>';
+    
+    const index = conjQuizPool.findIndex(q => 
+      q.verb.inf === quizConj.verb.inf && q.personIndex === quizConj.personIndex
+    );
+    if (index > -1) {
+      conjQuizPool.splice(index, 1);
+    }
+    
+    setTimeout(() => {
+      nextConj();
+    }, 1000);
+    
+  } else {
+    btn.classList.add('wrong');
+    conjStats.wrong++;
+    
+    allButtons.forEach(b => {
+      if (b.textContent === correctAnswer) {
+        b.classList.add('correct');
+      }
+    });
+    
+    $('conjR').innerHTML = '<span class="fail">✗ Richtig wäre: ' + correctAnswer + '</span>';
+    
+    const index = conjQuizPool.findIndex(q => 
+      q.verb.inf === quizConj.verb.inf && q.personIndex === quizConj.personIndex
+    );
+    if (index > -1) {
+      const wrongQuestion = conjQuizPool.splice(index, 1)[0];
+      conjWrongAnswers.push(wrongQuestion);
+    }
+    
+    $('conjNextBtn').classList.remove('hidden');
+  }
+  
+  updateConjStatsDisplay();
+  updateConjProgressBar();
+}
+
+function updateConjStatsDisplay() {
+  $('conjRightMini').innerText = conjStats.right;
+  $('conjWrongMini').innerText = conjStats.wrong;
+  $('conjRemaining').innerText = conjQuizPool.length + conjWrongAnswers.length;
+}
+
+function updateConjProgressBar() {
+  // Calculate total questions at start
+  let totalQuestions = 0;
+  conjVerbs.forEach(v => {
+    PERSON_KEYS.forEach(key => {
+      if (v[key] && v[key].trim()) {
+        totalQuestions++;
+      }
+    });
+  });
+  
+  const percentage = totalQuestions > 0 ? (conjStats.right / totalQuestions) * 100 : 0;
+  $('conjProgress').style.width = percentage + '%';
+}
+
+// Text input handler for conj quiz
+$('conjInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const userAnswer = $('conjInput').value.trim().toLowerCase();
+    const correctAnswer = quizConj.verb[PERSON_KEYS[quizConj.personIndex]].toLowerCase();
+    const correct = userAnswer === correctAnswer;
+    
+    if (correct) {
+      conjStats.right++;
+      $('conjR').innerHTML = '<span class="success">✓ Richtig!</span>';
+      
+      const index = conjQuizPool.findIndex(q => 
+        q.verb.inf === quizConj.verb.inf && q.personIndex === quizConj.personIndex
+      );
+      if (index > -1) {
+        conjQuizPool.splice(index, 1);
+      }
+      
+      updateConjStatsDisplay();
+      updateConjProgressBar();
+      
+      setTimeout(() => {
+        nextConj();
+      }, 1000);
+      
+    } else {
+      conjStats.wrong++;
+      $('conjR').innerHTML = '<span class="fail">✗ Richtig wäre: ' + quizConj.verb[PERSON_KEYS[quizConj.personIndex]] + '</span>';
+      
+      const index = conjQuizPool.findIndex(q => 
+        q.verb.inf === quizConj.verb.inf && q.personIndex === quizConj.personIndex
+      );
+      if (index > -1) {
+        const wrongQuestion = conjQuizPool.splice(index, 1)[0];
+        conjWrongAnswers.push(wrongQuestion);
+      }
+      
+      updateConjStatsDisplay();
+      updateConjProgressBar();
+      
+      $('conjNextBtn').classList.remove('hidden');
+    }
+  }
+});
+
+function endConjQuiz(completed = false) {
+  $('conjQuiz').classList.add('hidden');
+  
+  const total = conjStats.right + conjStats.wrong;
+  const accuracy = total > 0 ? Math.round((conjStats.right / total) * 100) : 0;
+  
+  const message = completed 
+    ? `🎉 Quiz abgeschlossen!\n\nAlle Konjugationen gelernt!\nRichtig: ${conjStats.right}\nFalsch: ${conjStats.wrong}\nGenauigkeit: ${accuracy}%`
+    : `Quiz beendet!\n\nRichtig: ${conjStats.right}\nFalsch: ${conjStats.wrong}\nGenauigkeit: ${accuracy}%`;
+  
+  alert(message);
+}
+</script>
 
 </body>
 </html>
